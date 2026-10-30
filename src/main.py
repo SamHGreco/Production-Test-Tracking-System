@@ -1,5 +1,6 @@
 from addProduct import add_product
 from viewProduct import view_product
+from testFunctions import test_entry
 
 database = [
     {
@@ -18,30 +19,38 @@ database = [
     }
 ]
 
+valid_types_results = ["PASS", "FAIL"]
 
 
 def search_product():
-   serial_number = input("Enter serial number to search: ")
-   for p in database:
-      if p["serial_number"].lower() == serial_number.lower():
-         product_found = p
-         return product_found
-      
-   print("Product not found")
-   return None
+    searchlist = []
+    del searchlist[:]
+    keyword = input("Enter keyword to search: ").lower()
+    for p in database:
+        if keyword in p["serial_number"].lower() or keyword in p["model"].lower() or any(keyword in test['technician'].lower() for test in p["tests"]) or any(keyword in test['testName'].lower() for test in p["tests"]):
+            searchlist.append(p)
+    
+    if searchlist:
+        return searchlist
+    
+    print("Product not found")
+    return None
+
 
 def quick_print(print_product):
     if print_product:
-        print("Serial Number:", print_product["serial_number"])
-        print("Model:", print_product["model"])
-        print("Build Date:", print_product["build_date"])
-        print("Status:", print_product["status"])
-        print("Tests:")
-        for test in print_product["tests"]:
-            print("  Test Name:", test["testName"])
-            print("  Result:", test["result"])
-            print("  Technician:", test["technician"])
-            print("  Timestamp:", test["timestamp"])
+        for i in print_product:
+            if print_product:
+                print("Serial Number:", i['serial_number'])
+                print("Model:", i['model'])
+                print("Build Date:", i['build_date'])
+                print("Status:", i['status'])
+                print("Tests:")
+                for test in i['tests']:
+                    print("  Test Name:", test['testName'])
+                    print("  Result:", test['result'])
+                    print("  Technician:", test['technician'])
+                    print("  Timestamp:", test['timestamp'])
     else:
         print("No product to display.")
 
@@ -60,7 +69,13 @@ while True:
     if menuChoice == "1":
         database.append(add_product())
     elif menuChoice == "2":
-        print("x")
+        product_found = search_product()
+        if product_found:
+            print("Product found:", product_found)
+            test_recorded = test_entry(valid_types_results)
+            product_found[0]["tests"].append(test_recorded)
+        else:
+            print("Product not found.")
     elif menuChoice == "3":
         view_product(database)
     elif menuChoice == "4":
