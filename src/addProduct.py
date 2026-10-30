@@ -1,5 +1,4 @@
 
-
 def add_product():
     serial_number = input("Enter serial number: ")
     model = input("Enter model: ")
